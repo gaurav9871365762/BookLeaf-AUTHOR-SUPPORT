@@ -50,3 +50,20 @@ The BookLeaf Author Support Portal is a dual-portal application (`Author Portal`
   - `ticket:created`: Instantly alerts the admin triage queue when an author submits a ticket.
   - `ticket:updated`: Broadcasts category, priority, or status changes in real time.
   - `message:created`: Delivers staff replies directly into the author's open conversation view without requiring manual page reloads. Internal notes are routed exclusively to the admin room.
+
+---
+
+## 5. Containerized Production Architecture (Docker)
+
+### Multi-Tier Service Topology
+The entire application is packaged using Docker and orchestrated with Docker Compose into 3 isolated services:
+1. **Database Tier (`mongo:7.0`)**: Runs with health-check commands (`mongosh ping`) and a persistent Docker volume (`mongo_data`) preserving author ledgers and ticket threads across restarts.
+2. **Backend API Tier (`server/Dockerfile`)**: Built on Node.js 22 LTS with multi-stage layer caching, native C++ build tools for `bcrypt`, and TypeScript compilation. Runs in production mode with strict JWT validation.
+3. **Frontend Edge Tier (`client/Dockerfile` & `client/nginx.conf`)**: Multi-stage build producing compressed static assets served by Nginx Alpine. Nginx reverse-proxies `/api` and `/socket.io` (with WebSocket upgrade handshake headers) to the backend container, eliminating CORS complexities and providing single-origin deployment.
+
+### Realistic Operational Dataset
+The seeder (`npm run docker:seed`) populates:
+- **10 Authors & 18 Books** spanning published bestsellers and in-production titles.
+- **7 Pre-Configured Support Tickets** covering all 6 official categories (`Royalty & Payments`, `ISBN & Metadata`, `Printing & Quality`, `Distribution & Availability`, `Book Status`, `General Inquiry`).
+- **Live Discussion Threads & Private Notes**: Includes real-world discussions and staff-only internal notes highlighting print tolerances and finance remittance schedules.
+- **AI Audit Records (`AIMeta`)**: Pre-populated classification metrics (confidence score, latency, prompt version).

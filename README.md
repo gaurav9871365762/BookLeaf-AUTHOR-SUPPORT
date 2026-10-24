@@ -54,12 +54,35 @@ A full-stack, role-based publishing support desk and royalty analytics system bu
 
 ## 🚀 Quick Start Guide
 
-### Prerequisites
+### Option A: Docker Compose (Recommended - Zero Setup Required)
+
+Everything is containerized into a production-grade multi-container topology (`MongoDB 7.0` + `Express Node 22 API` + `Nginx React Client`):
+
+```bash
+# 1. Start all services in background
+docker compose up -d
+# (or: npm run docker:up)
+
+# 2. Seed database (10 authors, 18 books, 7 realistic tickets with conversations & AI metadata)
+docker compose exec server npm run seed
+# (or: npm run docker:seed)
+```
+
+- **Web App**: Open [http://localhost:5173](http://localhost:5173) in your browser.
+- **API Health**: [http://localhost:5000/api/health](http://localhost:5000/api/health)
+- **Live Logs**: `npm run docker:logs` or `docker compose logs -f`
+- **Stop Containers**: `npm run docker:down` or `docker compose down`
+
+---
+
+### Option B: Local Node.js Development
+
+#### Prerequisites
 - **Node.js** v18+ (tested on Node v22)
 - **MongoDB** running locally on port `27017` (or MongoDB Atlas connection string)
 
-### 1. Database Seeding (Idempotent)
-The seed script inserts the 10 authors, 18 books, and admin profile into MongoDB:
+#### 1. Database Seeding (Idempotent)
+The seed script inserts the 10 authors, 18 books, 7 realistic tickets, and the admin profile into MongoDB:
 ```bash
 cd server
 npm install
@@ -67,14 +90,14 @@ npm run seed
 ```
 *Re-running `npm run seed` is completely idempotent and will never duplicate records.*
 
-### 2. Start the Backend API
+#### 2. Start the Backend API
 ```bash
 cd server
 npm run dev
 ```
 *API runs at `http://localhost:5000` with WebSocket support.*
 
-### 3. Start the Frontend Client
+#### 3. Start the Frontend Client
 In a separate terminal:
 ```bash
 cd client
@@ -115,29 +138,38 @@ bookleaf-support/
 │   │   ├── types/              # TypeScript schemas (Book, Ticket, Message, User)
 │   │   ├── App.tsx             # Main portal router
 │   │   └── index.css           # Bespoke BookLeaf design system & tokens
-│   └── vite.config.ts          # Proxy configuration to API server
+│   ├── Dockerfile              # Multi-stage production build (Node builder -> Nginx runner)
+│   ├── nginx.conf              # Nginx reverse proxy routing /api & /socket.io to backend
+│   ├── .dockerignore           # Excludes local node_modules & dist
+│   └── vite.config.ts          # Local dev server proxy configuration
 ├── server/                     # Node.js + Express + TypeScript Backend
 │   ├── data/
 │   │   └── sample.json         # 10 authors & 18 books dataset
 │   ├── scripts/
-│   │   ├── seed.ts             # Idempotent upsert seed script
+│   │   ├── seed.ts             # Idempotent seeder (authors, books, 7 rich tickets, notes, AI meta)
 │   │   └── verify-all.ts       # Automated verification test suite
 │   ├── src/
 │   │   ├── config/             # MongoDB connection
 │   │   ├── middleware/         # HttpOnly JWT auth & Zod body validation
-│   │   ├── models/             # Mongoose schemas (Author, Book, User, Ticket, Message)
+│   │   ├── models/             # Mongoose schemas (Author, Book, User, Ticket, Message, AIMeta)
 │   │   ├── routes/             # Role-isolated route handlers (auth, books, tickets, admin)
 │   │   ├── services/           # AI triage & Knowledge Base policy engine
 │   │   ├── sockets/            # Real-time WebSocket manager
 │   │   └── server.ts           # HTTP server bootstrap
+│   ├── Dockerfile              # Production Node.js 22 runtime container
+│   ├── .dockerignore           # Excludes local node_modules, dist, & .env
 │   └── .env.example            # Environment configuration template
+├── docker-compose.yml          # Multi-container orchestration (Mongo 7 + Server + Client Nginx)
+├── .env.docker.example         # Docker Compose environment template
+├── .dockerignore               # Root build context exclusions
 ├── API_DOCUMENTATION.md        # Comprehensive endpoint reference
 ├── ONE_PAGE_WRITEUP.md         # Architecture, design decisions, and trade-offs
-└── README.md                   # This project guide
+└── README.md                   # Complete project and deployment guide
 ```
 
 ---
 
 ## 📖 Further Documentation
 - See [API_DOCUMENTATION.md](file:///c:/Users/gaura/OneDrive/Desktop/bookleaf-support/API_DOCUMENTATION.md) for request/response payloads.
-- See [ONE_PAGE_WRITEUP.md](file:///c:/Users/gaura/OneDrive/Desktop/bookleaf-support/ONE_PAGE_WRITEUP.md) for architectural rationale.
+- See [ONE_PAGE_WRITEUP.md](file:///c:/Users/gaura/OneDrive/Desktop/bookleaf-support/ONE_PAGE_WRITEUP.md) for architectural rationale and AI design decisions.
+- See [BookLeaf_Support_Portal_Complete_Documentation.pdf](file:///c:/Users/gaura/OneDrive/Desktop/bookleaf-support/BookLeaf_Support_Portal_Complete_Documentation.pdf) for formal system documentation.

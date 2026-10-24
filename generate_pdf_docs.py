@@ -242,10 +242,10 @@ def build_pdf(filename="BookLeaf_Support_Portal_Complete_Documentation.pdf"):
 
     counts_data = [
         [Paragraph("<b>Directory / Area</b>", body_style), Paragraph("<b>File Count</b>", body_style), Paragraph("<b>Key Responsibilities</b>", body_style)],
-        [Paragraph("<b>Root Directory</b>", body_style), Paragraph("7 files", body_style), Paragraph("Project orchestration, package scripts, git hygiene (.gitignore), API docs, architecture write-up, and source assignment guide.", body_style)],
-        [Paragraph("<b>Server Backend (`server/`)</b>", body_style), Paragraph("20 files", body_style), Paragraph("Express API, TypeScript config, MongoDB Mongoose schemas, HttpOnly auth middleware, AI triage service, Socket.IO real-time hub, seed data, and verification tests.", body_style)],
-        [Paragraph("<b>Client Frontend (`client/`)</b>", body_style), Paragraph("18 files", body_style), Paragraph("React 18, Vite bundler, TypeScript interfaces, BookLeaf custom CSS design system, 8 modular UI components, API client, and Socket.IO client.", body_style)],
-        [Paragraph("<b>Total Project Footprint</b>", body_bold), Paragraph("<b>45 code/doc files</b>", body_bold), Paragraph("Excludes node_modules and build artifacts (dist), which are git-ignored.", body_bold)]
+        [Paragraph("<b>Root Directory</b>", body_style), Paragraph("10 files", body_style), Paragraph("Docker Compose orchestration (docker-compose.yml, .env.docker.example), package scripts, git hygiene (.gitignore), API docs, architecture write-up, and complete documentation.", body_style)],
+        [Paragraph("<b>Server Backend (`server/`)</b>", body_style), Paragraph("22 files", body_style), Paragraph("Dockerfile, .dockerignore, Express API, TypeScript config, MongoDB Mongoose schemas, HttpOnly auth middleware, AI triage service, Socket.IO hub, 7 pre-seeded tickets & notes, and verification suite.", body_style)],
+        [Paragraph("<b>Client Frontend (`client/`)</b>", body_style), Paragraph("21 files", body_style), Paragraph("Multi-stage Dockerfile, Nginx reverse proxy configuration, React 18, Vite bundler, BookLeaf design system, 8 modular UI components, API client, and Socket.IO client.", body_style)],
+        [Paragraph("<b>Total Project Footprint</b>", body_bold), Paragraph("<b>53 code/doc files</b>", body_bold), Paragraph("Complete production-ready stack with multi-tier Docker containers. Excludes node_modules and dist build artifacts.", body_bold)]
     ]
     t_counts = Table(counts_data, colWidths=[120, 65, 319])
     t_counts.setStyle(TableStyle([
@@ -290,8 +290,10 @@ def build_pdf(filename="BookLeaf_Support_Portal_Complete_Documentation.pdf"):
         ("server/src/services/ai.service.ts", "AI Triage & Draft Service", "Implements classifyTicket and draftReply. Uses OpenAI API with JSON mode when OPENAI_API_KEY is configured. Includes a deterministic, Zod-validated heuristic engine for offline/demo resilience."),
         ("server/src/services/knowledgeBase.ts", "Publishing Policy Engine", "Source-of-truth knowledge facts across all 6 categories (80/20 profit split, quarterly payouts, Rs. 1,000 minimum balance, 5-7 day print turnaround, etc.). Feeds exact facts to AI drafting."),
         ("server/src/sockets/index.ts", "Real-Time WebSocket Hub", "Socket.IO server attaching to Node HTTP server. Authenticates connection via JWT. Manages admin-room and author:<id> rooms. Emits ticket:created, ticket:updated, and message:created (strictly gating internal notes to admin-room)."),
-        ("server/scripts/seed.ts", "Idempotent Database Seeder", "Parses server/data/sample.json, upserts admin account, 10 authors, and 18 books using Mongoose updateOne(..., { upsert: true }). Completely safe to re-run with zero duplicates."),
-        ("server/scripts/verify-all.ts", "End-to-End Test Suite", "Automated verification test script testing all 6 core requirements: API health, auth, author book boundary isolation, AI triage, internal note redaction, and staff review.")
+        ("server/scripts/seed.ts", "Idempotent Database Seeder", "Parses server/data/sample.json, upserts admin account, 10 authors, 18 books, 7 realistic tickets across all 6 categories, public messages, private internal admin notes, and AI classification audit records. Idempotent and safe."),
+        ("server/scripts/verify-all.ts", "End-to-End Test Suite", "Automated verification test script testing all 6 core requirements: API health, auth, author book boundary isolation, AI triage, internal note redaction, and staff review."),
+        ("server/Dockerfile", "Production Node.js 22 Container", "Multi-layer cached production image with native C++ build tools for bcrypt, automated TypeScript compilation, and Node.js 22 runtime on port 5000."),
+        ("server/.dockerignore", "Build Context Exclusions", "Prevents local node_modules, dist, and environment secrets from being copied into the server container.")
     ]
 
     for path, title, desc in server_files:
@@ -336,7 +338,10 @@ def build_pdf(filename="BookLeaf_Support_Portal_Complete_Documentation.pdf"):
         ("client/src/components/AdminTicketDetail.tsx", "Staff Triage & AI Reply Workspace", "Comprehensive triage workspace: dropdowns to reclassify Category, Priority, Status, and Assignee; 'Generate AI Draft Reply' button; editable compose reply box with explicit send; and private internal note creator."),
         ("client/src/components/AdminBooksView.tsx", "Complete Catalog Database", "Admin view of all 18 titles across all 10 authors with aggregate catalog statistics, status filters, and search functionality."),
         ("client/vite.config.ts", "Vite Dev Server & Proxy", "Configures local dev server on port 5173 with automatic reverse-proxying of /api and /socket.io requests to backend at http://localhost:5000."),
-        ("client/index.html", "HTML5 Entrypoint", "Loads Google Fonts (Plus Jakarta Sans, Outfit, JetBrains Mono), meta tags, custom BookLeaf SVG favicon, and mounts the React root.")
+        ("client/index.html", "HTML5 Entrypoint", "Loads Google Fonts (Plus Jakarta Sans, Outfit, JetBrains Mono), meta tags, custom BookLeaf SVG favicon, and mounts the React root."),
+        ("client/Dockerfile", "Multi-Stage Nginx Runner", "Stage 1 compiles the optimized production React bundle; Stage 2 serves assets through lightweight Nginx Alpine on port 80."),
+        ("client/nginx.conf", "Reverse Proxy Configuration", "Routes /api and /socket.io (WebSocket upgrade) to server:5000 and provides client-side SPA routing fallback."),
+        ("client/.dockerignore", "Build Context Exclusions", "Excludes local node_modules and dist artifacts from the Docker build context.")
     ]
 
     for path, title, desc in client_files:
@@ -420,8 +425,14 @@ def build_pdf(filename="BookLeaf_Support_Portal_Complete_Documentation.pdf"):
     story.append(Spacer(1, 14))
 
     # Verification Commands Box
-    story.append(Paragraph("<b>Running The Project & Tests:</b>", h2_style))
-    story.append(Paragraph("• <b>Run Seeder:</b> <code>cd server && npm run seed</code> (Idempotent upsert of 10 authors, 18 books, 1 admin)", bullet_style))
+    story.append(Paragraph("<b>Docker Compose (Production-Grade Stack):</b>", h2_style))
+    story.append(Paragraph("• <b>Start All Containers:</b> <code>docker compose up -d</code> (or <code>npm run docker:up</code>)", bullet_style))
+    story.append(Paragraph("• <b>Seed DB in Container:</b> <code>docker compose exec server npm run seed</code> (or <code>npm run docker:seed</code>)", bullet_style))
+    story.append(Paragraph("• <b>Follow Live Logs:</b> <code>docker compose logs -f</code> (or <code>npm run docker:logs</code>)", bullet_style))
+    story.append(Paragraph("• <b>Stop All Containers:</b> <code>docker compose down</code> (or <code>npm run docker:down</code>)", bullet_style))
+    story.append(Spacer(1, 4))
+    story.append(Paragraph("<b>Local Node.js Development (Alternative):</b>", h2_style))
+    story.append(Paragraph("• <b>Run Seeder:</b> <code>cd server && npm run seed</code> (Idempotent upsert of 10 authors, 18 books, 7 tickets, 1 admin)", bullet_style))
     story.append(Paragraph("• <b>Run Verification Suite:</b> <code>cd server && npx tsx scripts/verify-all.ts</code> (Automated 6-point test suite)", bullet_style))
     story.append(Paragraph("• <b>Start API Server:</b> <code>cd server && npm run dev</code> (Runs Express + Socket.IO on port 5000)", bullet_style))
     story.append(Paragraph("• <b>Start Frontend Client:</b> <code>cd client && npm run dev</code> (Runs Vite React app on port 5173)", bullet_style))
