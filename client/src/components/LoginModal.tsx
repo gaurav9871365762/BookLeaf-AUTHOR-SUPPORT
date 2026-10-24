@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Shield, BookOpen, Key, AlertCircle, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Shield, BookOpen, AlertCircle, Sparkles } from 'lucide-react';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -37,7 +37,7 @@ const DEMO_ACCOUNTS = [
   {
     role: 'author',
     name: 'Rohit Kapoor (AUTH002)',
-    desc: 'Best-selling author (2,000+ copies sold, ₹84k+ royalties)',
+    desc: 'Best-selling author (2,000+ copies sold, Rs. 84k+ royalties)',
     email: 'rohit.kapoor@email.com',
     pass: 'AuthorPassword123!',
     tag: 'Author'
@@ -90,7 +90,6 @@ export const LoginModal: React.FC<LoginModalProps> = ({
         overflow: 'hidden',
         animation: 'fadeIn 0.2s ease-out'
       }}>
-        {/* Modal Header */}
         <div style={{
           background: 'linear-gradient(135deg, #0f3d2e 0%, #165641 100%)',
           padding: '24px 28px',
@@ -144,7 +143,6 @@ export const LoginModal: React.FC<LoginModalProps> = ({
             </div>
           )}
 
-          {/* 1-Click Demo Profiles */}
           <div style={{ marginBottom: 22 }}>
             <label style={{
               display: 'block',
@@ -239,7 +237,6 @@ export const LoginModal: React.FC<LoginModalProps> = ({
             <div style={{ flex: 1, height: 1, background: '#e2e8f0' }} />
           </div>
 
-          {/* Manual Login Form */}
           <form onSubmit={handleSubmit}>
             <div style={{ marginBottom: 14 }}>
               <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#334155', marginBottom: 5 }}>

@@ -1,18 +1,6 @@
 import React, { useState } from 'react';
 import type { Ticket, TicketCategory, TicketPriority, TicketStatus } from '../types';
-import {
-  Filter,
-  ArrowUpDown,
-  AlertTriangle,
-  Clock,
-  Sparkles,
-  Bot,
-  User,
-  CheckCircle,
-  RefreshCw,
-  Search,
-  BookOpen
-} from 'lucide-react';
+import { Sparkles, User, CheckCircle, RefreshCw, Search } from 'lucide-react';
 
 interface AdminQueueProps {
   tickets: Ticket[];
@@ -50,7 +38,6 @@ export const AdminQueue: React.FC<AdminQueueProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Quick stats
   const totalCount = tickets.length;
   const criticalCount = tickets.filter((t) => t.priority === 'Critical').length;
   const openCount = tickets.filter((t) => t.status === 'Open').length;
@@ -69,7 +56,6 @@ export const AdminQueue: React.FC<AdminQueueProps> = ({
 
   return (
     <div className="animate-fade-in">
-      {/* Top Metric Cards */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
@@ -135,7 +121,6 @@ export const AdminQueue: React.FC<AdminQueueProps> = ({
         </div>
       </div>
 
-      {/* Filter Toolbar */}
       <div style={{
         background: '#ffffff',
         borderRadius: 14,
@@ -149,7 +134,6 @@ export const AdminQueue: React.FC<AdminQueueProps> = ({
         alignItems: 'center',
         justifyContent: 'space-between'
       }}>
-        {/* Search */}
         <div style={{ position: 'relative', minWidth: 240, flex: 1 }}>
           <Search size={16} color="#94a3b8" style={{ position: 'absolute', left: 12, top: 11 }} />
           <input
@@ -169,9 +153,7 @@ export const AdminQueue: React.FC<AdminQueueProps> = ({
           />
         </div>
 
-        {/* Dropdowns */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center' }}>
-          {/* Status Filter */}
           <select
             id="filter-status-select"
             value={filters.status}
@@ -191,7 +173,6 @@ export const AdminQueue: React.FC<AdminQueueProps> = ({
             ))}
           </select>
 
-          {/* Category Filter */}
           <select
             id="filter-category-select"
             value={filters.category}
@@ -211,7 +192,6 @@ export const AdminQueue: React.FC<AdminQueueProps> = ({
             ))}
           </select>
 
-          {/* Priority Filter */}
           <select
             id="filter-priority-select"
             value={filters.priority}
@@ -231,7 +211,6 @@ export const AdminQueue: React.FC<AdminQueueProps> = ({
             ))}
           </select>
 
-          {/* Sort Filter */}
           <select
             id="filter-sort-select"
             value={filters.sort}
@@ -249,7 +228,6 @@ export const AdminQueue: React.FC<AdminQueueProps> = ({
             <option value="oldest">Oldest First (FIFO)</option>
           </select>
 
-          {/* Refresh button */}
           <button
             id="refresh-queue-btn"
             onClick={onRefresh}
@@ -274,7 +252,6 @@ export const AdminQueue: React.FC<AdminQueueProps> = ({
         </div>
       </div>
 
-      {/* Ticket List */}
       {loading ? (
         <div style={{ textAlign: 'center', padding: '60px 20px', color: '#64748b' }}>
           <div className="pulsing-dot" style={{ background: '#d97706', width: 14, height: 14, marginBottom: 12 }} />
@@ -328,7 +305,6 @@ export const AdminQueue: React.FC<AdminQueueProps> = ({
               >
                 <div style={{ flex: 1, minWidth: 280 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
-                    {/* Urgency indicator */}
                     {isCritical && (
                       <span style={{
                         display: 'inline-flex',
@@ -363,7 +339,6 @@ export const AdminQueue: React.FC<AdminQueueProps> = ({
                       {ticket.category}
                     </span>
 
-                    {/* AI vs Admin Source badge */}
                     {ticket.categorySource === 'ai' ? (
                       <span className="badge badge-ai" title="AI classified based on author description">
                         <Sparkles size={11} />

@@ -2,17 +2,7 @@ import React, { useState, useEffect } from 'react';
 import type { Ticket, TicketMessage, Book } from '../types';
 import { api } from '../services/api';
 import { joinTicketRoom, leaveTicketRoom, getSocket } from '../services/socket';
-import {
-  MessageSquare,
-  Clock,
-  Send,
-  AlertCircle,
-  ArrowLeft,
-  CheckCircle,
-  Bot,
-  User as UserIcon,
-  BookOpen
-} from 'lucide-react';
+import { ArrowLeft, Send, BookOpen } from 'lucide-react';
 
 interface AuthorTicketsProps {
   tickets: Ticket[];
@@ -33,12 +23,10 @@ export const AuthorTickets: React.FC<AuthorTicketsProps> = ({
 }) => {
   const [activeTicket, setActiveTicket] = useState<Ticket | null>(null);
   const [messages, setMessages] = useState<TicketMessage[]>([]);
-  const [loadingDetail, setLoadingDetail] = useState(false);
   const [replyText, setReplyText] = useState('');
   const [sendingReply, setSendingReply] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Load ticket details when selectedTicketId changes
   useEffect(() => {
     if (!selectedTicketId) {
       setActiveTicket(null);
@@ -48,7 +36,6 @@ export const AuthorTickets: React.FC<AuthorTicketsProps> = ({
 
     const loadDetail = async () => {
       try {
-        setLoadingDetail(true);
         setError(null);
         joinTicketRoom(selectedTicketId);
         const res = await api.getTicketDetail(selectedTicketId);
@@ -56,8 +43,6 @@ export const AuthorTickets: React.FC<AuthorTicketsProps> = ({
         setMessages(res.messages);
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : 'Could not load ticket conversation.');
-      } finally {
-        setLoadingDetail(false);
       }
     };
 
@@ -68,13 +53,11 @@ export const AuthorTickets: React.FC<AuthorTicketsProps> = ({
     };
   }, [selectedTicketId]);
 
-  // Listen for real-time messages & ticket updates via socket
   useEffect(() => {
     const socket = getSocket();
 
     const handleMessageCreated = (newMsg: TicketMessage) => {
       if (selectedTicketId && newMsg.ticketId === selectedTicketId) {
-        // Authors only receive public messages anyway, but verify visibility
         if (newMsg.visibility === 'public') {
           setMessages((prev) => {
             if (prev.some((m) => m._id === newMsg._id)) return prev;
@@ -123,12 +106,10 @@ export const AuthorTickets: React.FC<AuthorTicketsProps> = ({
     return b ? `[${b.bookId}] ${b.title}` : `Book ID: ${bookId}`;
   };
 
-  // If viewing a single ticket conversation
   if (selectedTicketId && activeTicket) {
     const isClosed = activeTicket.status === 'Closed' || activeTicket.status === 'Resolved';
     return (
       <div className="animate-fade-in" style={{ maxWidth: 900, margin: '0 auto' }}>
-        {/* Back navigation */}
         <button
           id="back-to-tickets-btn"
           onClick={() => onSelectTicket(null)}
@@ -163,7 +144,6 @@ export const AuthorTickets: React.FC<AuthorTicketsProps> = ({
           </div>
         )}
 
-        {/* Ticket Header Card */}
         <div style={{
           background: '#ffffff',
           borderRadius: 16,
@@ -217,9 +197,7 @@ export const AuthorTickets: React.FC<AuthorTicketsProps> = ({
           </div>
         </div>
 
-        {/* Conversation Thread */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 24 }}>
-          {/* Initial Ticket Submission Message */}
           <div style={{
             background: '#ffffff',
             borderRadius: 14,
@@ -254,7 +232,6 @@ export const AuthorTickets: React.FC<AuthorTicketsProps> = ({
             </div>
           </div>
 
-          {/* Subsequent Messages */}
           {messages.map((msg) => {
             const isAdmin = msg.senderRole === 'admin';
             return (
@@ -313,7 +290,6 @@ export const AuthorTickets: React.FC<AuthorTicketsProps> = ({
           })}
         </div>
 
-        {/* Reply Box */}
         {!isClosed ? (
           <form onSubmit={handleSendReply} style={{
             background: '#ffffff',
@@ -384,7 +360,6 @@ export const AuthorTickets: React.FC<AuthorTicketsProps> = ({
     );
   }
 
-  // Tickets List View
   return (
     <div className="animate-fade-in">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
@@ -416,7 +391,6 @@ export const AuthorTickets: React.FC<AuthorTicketsProps> = ({
           borderRadius: 14,
           border: '1px solid #e2e8f0'
         }}>
-          <MessageSquare size={36} color="#94a3b8" style={{ marginBottom: 12 }} />
           <h4 style={{ fontSize: 16, color: '#334155' }}>No Support Tickets Found</h4>
           <p style={{ fontSize: 13, color: '#64748b', marginTop: 4 }}>
             You haven't submitted any tickets yet. Need help with royalties, printing, or ISBN?

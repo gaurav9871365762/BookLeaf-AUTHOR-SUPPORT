@@ -35,7 +35,6 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
 }
 
 export const api = {
-  // Auth
   async login(email: string, password: string): Promise<{ user: User }> {
     return request<{ user: User }>('/auth/login', {
       method: 'POST',
@@ -53,12 +52,10 @@ export const api = {
     return request<User>('/auth/me');
   },
 
-  // Books (Authors see their own; Admins see all)
   async getBooks(): Promise<Book[]> {
     return request<Book[]>('/books');
   },
 
-  // Author Ticket Endpoints
   async getTickets(): Promise<Ticket[]> {
     return request<Ticket[]>('/tickets');
   },
@@ -84,7 +81,6 @@ export const api = {
     });
   },
 
-  // Admin Endpoints
   async getAdminTickets(filters?: {
     status?: string;
     category?: string;

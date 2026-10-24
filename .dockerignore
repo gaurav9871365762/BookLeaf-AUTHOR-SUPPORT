@@ -1,0 +1,6 @@
+node_modules
+.git
+.gitignore
+*.docx
+*.pdf
+generate_pdf_docs.py

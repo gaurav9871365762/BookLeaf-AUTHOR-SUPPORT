@@ -5,18 +5,13 @@ import { joinTicketRoom, leaveTicketRoom, getSocket } from '../services/socket';
 import {
   ArrowLeft,
   Sparkles,
-  Bot,
   Send,
   Lock,
   CheckCircle,
   AlertCircle,
-  Clock,
   Shield,
-  FileText,
-  User,
   Save,
-  MessageSquare,
-  BookOpen
+  MessageSquare
 } from 'lucide-react';
 
 interface AdminTicketDetailProps {
@@ -47,24 +42,20 @@ export const AdminTicketDetail: React.FC<AdminTicketDetailProps> = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Triage state
   const [category, setCategory] = useState<TicketCategory>('General Inquiry');
   const [priority, setPriority] = useState<TicketPriority>('Medium');
   const [status, setStatus] = useState<TicketStatus>('Open');
   const [savingTriage, setSavingTriage] = useState(false);
   const [triageSuccess, setTriageSuccess] = useState(false);
 
-  // Reply state
   const [replyBody, setReplyBody] = useState('');
   const [generatingDraft, setGeneratingDraft] = useState(false);
   const [draftGenerated, setDraftGenerated] = useState(false);
   const [sendingReply, setSendingReply] = useState(false);
 
-  // Internal Note state
   const [noteBody, setNoteBody] = useState('');
   const [savingNote, setSavingNote] = useState(false);
 
-  // Load ticket details
   const fetchTicket = async () => {
     try {
       setLoading(true);
@@ -115,7 +106,6 @@ export const AdminTicketDetail: React.FC<AdminTicketDetailProps> = ({
     };
   }, [ticketId]);
 
-  // Handle Triage Update
   const handleSaveTriage = async () => {
     try {
       setSavingTriage(true);
@@ -136,7 +126,6 @@ export const AdminTicketDetail: React.FC<AdminTicketDetailProps> = ({
     }
   };
 
-  // Handle Generate AI Draft
   const handleGenerateAIDraft = async () => {
     try {
       setGeneratingDraft(true);
@@ -151,7 +140,6 @@ export const AdminTicketDetail: React.FC<AdminTicketDetailProps> = ({
     }
   };
 
-  // Handle Send Public Reply (Explicit admin send)
   const handleSendPublicReply = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!replyBody.trim()) return;
@@ -174,7 +162,6 @@ export const AdminTicketDetail: React.FC<AdminTicketDetailProps> = ({
     }
   };
 
-  // Handle Add Internal Note
   const handleAddInternalNote = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!noteBody.trim()) return;
@@ -215,7 +202,6 @@ export const AdminTicketDetail: React.FC<AdminTicketDetailProps> = ({
 
   return (
     <div className="animate-fade-in" style={{ maxWidth: 1100, margin: '0 auto' }}>
-      {/* Top back button */}
       <button
         id="admin-back-btn"
         onClick={onBack}
@@ -254,11 +240,8 @@ export const AdminTicketDetail: React.FC<AdminTicketDetailProps> = ({
         </div>
       )}
 
-      {/* Main Grid: Ticket Details (Left 7 cols) & Triage Control Panel (Right 5 cols) */}
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.6fr) minmax(320px, 1fr)', gap: 24, alignItems: 'start' }}>
-        {/* Left Column: Ticket conversation & editor */}
         <div>
-          {/* Ticket Header Box */}
           <div style={{
             background: '#ffffff',
             borderRadius: 16,
@@ -312,9 +295,7 @@ export const AdminTicketDetail: React.FC<AdminTicketDetailProps> = ({
             </div>
           </div>
 
-          {/* Conversation Stream (Both public messages & private internal notes) */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 24 }}>
-            {/* Original author ticket query */}
             <div style={{
               background: '#ffffff',
               borderRadius: 14,
@@ -352,7 +333,6 @@ export const AdminTicketDetail: React.FC<AdminTicketDetailProps> = ({
               </div>
             </div>
 
-            {/* Subsequent messages */}
             {messages.map((msg) => {
               const isInternal = msg.visibility === 'internal';
               const isAdmin = msg.senderRole === 'admin';
@@ -431,7 +411,6 @@ export const AdminTicketDetail: React.FC<AdminTicketDetailProps> = ({
             })}
           </div>
 
-          {/* AI Draft & Admin Reply Workspace */}
           <div style={{
             background: '#ffffff',
             borderRadius: 16,
@@ -448,7 +427,6 @@ export const AdminTicketDetail: React.FC<AdminTicketDetailProps> = ({
                 </h3>
               </div>
 
-              {/* AI Draft Trigger Button */}
               <button
                 id="generate-ai-draft-btn"
                 type="button"
@@ -474,7 +452,6 @@ export const AdminTicketDetail: React.FC<AdminTicketDetailProps> = ({
               </button>
             </div>
 
-            {/* AI Policy Reminder Banner */}
             <div style={{
               background: '#f8fafc',
               border: '1px solid #e2e8f0',
@@ -553,7 +530,6 @@ export const AdminTicketDetail: React.FC<AdminTicketDetailProps> = ({
             </form>
           </div>
 
-          {/* Private Internal Note Form */}
           <div style={{
             background: '#fffdf5',
             borderRadius: 16,
@@ -617,7 +593,6 @@ export const AdminTicketDetail: React.FC<AdminTicketDetailProps> = ({
           </div>
         </div>
 
-        {/* Right Column: Triage Control Panel */}
         <div style={{
           background: '#ffffff',
           borderRadius: 16,
@@ -660,7 +635,6 @@ export const AdminTicketDetail: React.FC<AdminTicketDetailProps> = ({
             </div>
           )}
 
-          {/* Category Dropdown */}
           <div style={{ marginBottom: 18 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
               <label style={{ fontSize: 13, fontWeight: 700, color: '#334155' }}>
@@ -690,7 +664,6 @@ export const AdminTicketDetail: React.FC<AdminTicketDetailProps> = ({
             </select>
           </div>
 
-          {/* Priority Dropdown */}
           <div style={{ marginBottom: 18 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
               <label style={{ fontSize: 13, fontWeight: 700, color: '#334155' }}>
@@ -720,7 +693,6 @@ export const AdminTicketDetail: React.FC<AdminTicketDetailProps> = ({
             </select>
           </div>
 
-          {/* Status Dropdown */}
           <div style={{ marginBottom: 24 }}>
             <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#334155', marginBottom: 6 }}>
               Ticket Status
@@ -745,7 +717,6 @@ export const AdminTicketDetail: React.FC<AdminTicketDetailProps> = ({
             </select>
           </div>
 
-          {/* Save Triage Button */}
           <button
             id="save-triage-btn"
             type="button"
@@ -772,7 +743,6 @@ export const AdminTicketDetail: React.FC<AdminTicketDetailProps> = ({
             <span>{savingTriage ? 'Saving...' : 'Apply Triage Updates'}</span>
           </button>
 
-          {/* Knowledge Base Reference Card */}
           <div style={{
             marginTop: 24,
             paddingTop: 18,

@@ -9,6 +9,11 @@
     "server:seed": "npm --prefix server run seed",
     "server:verify": "npx --prefix server tsx scripts/verify-all.ts",
     "client:dev": "npm --prefix client run dev",
-    "client:build": "npm --prefix client run build"
+    "client:build": "npm --prefix client run build",
+    "docker:build": "docker compose build",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f",
+    "docker:seed": "docker compose exec server npm run seed"
   }
 }

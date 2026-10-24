@@ -10,7 +10,7 @@ import { AuthorTickets } from './components/AuthorTickets';
 import { AdminQueue } from './components/AdminQueue';
 import { AdminTicketDetail } from './components/AdminTicketDetail';
 import { AdminBooksView } from './components/AdminBooksView';
-import { BookOpen, PlusCircle, MessageSquare, Shield, Layers, Sparkles, RefreshCw } from 'lucide-react';
+import { BookOpen, PlusCircle, MessageSquare, Shield } from 'lucide-react';
 
 export function App() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -20,7 +20,6 @@ export function App() {
   const [loginError, setLoginError] = useState<string | null>(null);
   const [socketConnected, setSocketConnected] = useState(false);
 
-  // Author Portal Navigation & Data
   const [authorTab, setAuthorTab] = useState<'books' | 'new-ticket' | 'tickets'>('books');
   const [authorBooks, setAuthorBooks] = useState<Book[]>([]);
   const [authorTickets, setAuthorTickets] = useState<Ticket[]>([]);
@@ -28,14 +27,12 @@ export function App() {
   const [selectedTicketIdForAuthor, setSelectedTicketIdForAuthor] = useState<string | null>(null);
   const [preselectedBookId, setPreselectedBookId] = useState<string | null>(null);
 
-  // Admin Portal Navigation & Data
   const [adminTab, setAdminTab] = useState<'queue' | 'detail' | 'all-books'>('queue');
   const [adminTickets, setAdminTickets] = useState<Ticket[]>([]);
   const [allCatalogBooks, setAllCatalogBooks] = useState<Book[]>([]);
   const [loadingAdminData, setLoadingAdminData] = useState(false);
   const [selectedTicketIdForAdmin, setSelectedTicketIdForAdmin] = useState<string | null>(null);
 
-  // Admin Filters
   const [adminFilters, setAdminFilters] = useState({
     status: '',
     category: '',
@@ -43,7 +40,6 @@ export function App() {
     sort: 'urgent'
   });
 
-  // Verify auth session on mount
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -59,7 +55,6 @@ export function App() {
     checkAuth();
   }, []);
 
-  // Setup Socket.IO listener
   useEffect(() => {
     const socket = getSocket();
 
@@ -85,7 +80,6 @@ export function App() {
     };
   }, [currentUser]);
 
-  // Load Author Data
   const fetchAuthorData = useCallback(async () => {
     if (!currentUser || currentUser.role !== 'author') return;
     try {
@@ -100,14 +94,13 @@ export function App() {
     }
   }, [currentUser]);
 
-  // Load Admin Data
   const fetchAdminData = useCallback(async () => {
     if (!currentUser || currentUser.role !== 'admin') return;
     try {
       setLoadingAdminData(true);
       const [tickets, books] = await Promise.all([
         api.getAdminTickets(adminFilters),
-        api.getBooks() // As admin, this returns all 18 books across all authors!
+        api.getBooks()
       ]);
       setAdminTickets(tickets);
       setAllCatalogBooks(books);
@@ -126,7 +119,6 @@ export function App() {
     }
   }, [currentUser, fetchAuthorData, fetchAdminData]);
 
-  // Listen to live socket events for refreshing views
   useEffect(() => {
     const socket = getSocket();
 
@@ -149,7 +141,6 @@ export function App() {
     };
   }, [currentUser, fetchAdminData, fetchAuthorData]);
 
-  // Login handler
   const handleLogin = async (email: string, pass: string) => {
     try {
       setLoginLoading(true);
@@ -168,13 +159,10 @@ export function App() {
     }
   };
 
-  // Logout handler
   const handleLogout = async () => {
     try {
       await api.logout();
-    } catch {
-      // ignore
-    } finally {
+    } catch {} finally {
       setCurrentUser(null);
       setAuthorBooks([]);
       setAuthorTickets([]);
@@ -183,13 +171,11 @@ export function App() {
     }
   };
 
-  // When author clicks "Raise Ticket for this Book"
   const handleRaiseTicketForBook = (bookId: string) => {
     setPreselectedBookId(bookId);
     setAuthorTab('new-ticket');
   };
 
-  // When ticket created from form
   const handleTicketCreated = (createdTicket: Ticket) => {
     fetchAuthorData();
     setSelectedTicketIdForAuthor(createdTicket._id);
@@ -234,10 +220,8 @@ export function App() {
 
       {currentUser && (
         <main style={{ flex: 1, maxWidth: 1320, width: '100%', margin: '0 auto', padding: '24px' }}>
-          {/* AUTHOR VIEW */}
           {currentUser.role === 'author' && (
             <div>
-              {/* Author Navigation Sub-Tabs */}
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -339,7 +323,6 @@ export function App() {
                 </button>
               </div>
 
-              {/* Author Tab Contents */}
               {authorTab === 'books' && (
                 <AuthorBooks
                   books={authorBooks}
@@ -370,10 +353,8 @@ export function App() {
             </div>
           )}
 
-          {/* ADMIN VIEW */}
           {currentUser.role === 'admin' && (
             <div>
-              {/* Admin Navigation Sub-Tabs */}
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -451,7 +432,6 @@ export function App() {
                 </button>
               </div>
 
-              {/* Admin Tab Contents */}
               {adminTab === 'queue' && (
                 <AdminQueue
                   tickets={adminTickets}

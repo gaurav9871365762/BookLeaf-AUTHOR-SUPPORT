@@ -33,7 +33,6 @@ export const AdminBooksView: React.FC<AdminBooksViewProps> = ({ books, loading }
 
   return (
     <div className="animate-fade-in">
-      {/* Metrics */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
@@ -69,7 +68,6 @@ export const AdminBooksView: React.FC<AdminBooksViewProps> = ({ books, loading }
         </div>
       </div>
 
-      {/* Filter Bar */}
       <div style={{
         background: '#ffffff',
         borderRadius: 14,
@@ -120,7 +118,6 @@ export const AdminBooksView: React.FC<AdminBooksViewProps> = ({ books, loading }
         </select>
       </div>
 
-      {/* Books Table with null-safe handling */}
       <div style={{
         background: '#ffffff',
         borderRadius: 14,

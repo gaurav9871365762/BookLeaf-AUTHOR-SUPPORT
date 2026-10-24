@@ -7,6 +7,9 @@ import { connectToDatabase } from "../src/config/db";
 import { Author } from "../src/models/Author";
 import { Book } from "../src/models/Book";
 import { User } from "../src/models/User";
+import { Ticket, TICKET_CATEGORIES, TICKET_PRIORITIES, TICKET_STATUSES } from "../src/models/Ticket";
+import { TicketMessage } from "../src/models/TicketMessage";
+import { AIMeta } from "../src/models/AIMeta";
 import { z } from "zod";
 
 const nullableText = z.string().nullable().optional();
@@ -144,7 +147,233 @@ async function seed(): Promise<void> {
     }
   }
 
-  console.info(`Seed complete: ${parsed.authors.length} authors, ${bookCount} books, and 1 admin account.`);
+  let ticketCount = 0;
+  const adminDoc = await User.findOne({ email: adminEmail });
+
+  const sampleTicketDefinitions = [
+    {
+      authorId: "AUTH001",
+      bookId: "BK001",
+      subject: "Discrepancy in October 2025 royalty payout & pending balance",
+      description: "Hi team, I noticed that my total copies sold for 'Whispers of the Ganges' is 342, but my royalty pending still shows ₹3,570 from the last payout cycle on 2025-10-15. Can you please check the bank transfer reference and clarify when the remaining balance will be credited to my account?",
+      category: "Royalty & Payments" as const,
+      categorySource: "ai" as const,
+      priority: "Critical" as const,
+      prioritySource: "ai" as const,
+      status: "Open" as const,
+      aiSuggestionAvailable: true,
+      messages: [
+        {
+          role: "author" as const,
+          visibility: "public" as const,
+          body: "Hi team, I noticed that my total copies sold for 'Whispers of the Ganges' is 342, but my royalty pending still shows ₹3,570 from the last payout cycle on 2025-10-15. Can you please check the bank transfer reference and clarify when the remaining balance will be credited to my account?"
+        },
+        {
+          role: "author" as const,
+          visibility: "public" as const,
+          body: "I have verified my IFSC and account details on file and they haven't changed since last quarter."
+        },
+        {
+          role: "admin" as const,
+          visibility: "internal" as const,
+          body: "Checked accounts ledger: 102 copies were billed through Amazon Seller Central with 60-day remittance terms. Finance confirmed batch payout is scheduled for Friday."
+        }
+      ]
+    },
+    {
+      authorId: "AUTH002",
+      bookId: "BK003",
+      subject: "Incorrect genre and truncated subtitle listed on Amazon India",
+      description: "On Amazon India, 'Code & Karma' is showing under 'Romance Fiction' instead of 'Self-Help / Technology', and my subtitle was truncated. Could you please update the ONIX metadata feed?",
+      category: "ISBN & Metadata Issues" as const,
+      categorySource: "ai" as const,
+      priority: "High" as const,
+      prioritySource: "ai" as const,
+      status: "In Progress" as const,
+      aiSuggestionAvailable: true,
+      messages: [
+        {
+          role: "author" as const,
+          visibility: "public" as const,
+          body: "On Amazon India, 'Code & Karma' is showing under 'Romance Fiction' instead of 'Self-Help / Technology', and my subtitle was truncated. Could you please update the ONIX metadata feed?"
+        },
+        {
+          role: "admin" as const,
+          visibility: "public" as const,
+          body: "Hello Rohit, our distribution desk has prepared the updated ONIX 3.0 metadata record with the correct BISAC categories. We've pushed the sync to Amazon India."
+        },
+        {
+          role: "admin" as const,
+          visibility: "internal" as const,
+          body: "Amazon ingestion queue usually processes ONIX updates within 24-48 business hours."
+        }
+      ]
+    },
+    {
+      authorId: "AUTH003",
+      bookId: "BK005",
+      subject: "Spine alignment off by 4mm on latest paperback print run",
+      description: "Several readers who bought 'Between Two Temples' from the BookLeaf Store reported that the spine text is misaligned and wraps slightly onto the front cover. Attached photos show the cut margin issue.",
+      category: "Printing & Quality" as const,
+      categorySource: "ai" as const,
+      priority: "High" as const,
+      prioritySource: "ai" as const,
+      status: "Waiting on Author" as const,
+      aiSuggestionAvailable: true,
+      messages: [
+        {
+          role: "author" as const,
+          visibility: "public" as const,
+          body: "Several readers who bought 'Between Two Temples' from the BookLeaf Store reported that the spine text is misaligned and wraps slightly onto the front cover. Attached photos show the cut margin issue."
+        },
+        {
+          role: "admin" as const,
+          visibility: "public" as const,
+          body: "Hi Ananya, thank you for alerting us. We take print tolerances very seriously. Could you ask one of the readers for the 6-digit batch code stamped on the inside back cover?"
+        }
+      ]
+    },
+    {
+      authorId: "AUTH004",
+      bookId: "BK006",
+      subject: "Paperback showing 'Temporarily Out of Stock' on Flipkart",
+      description: "My readers are messaging that 'Debugging Life' has been out of stock on Flipkart for the last 5 days despite active marketing campaigns. Can we replenish print-on-demand stock immediately?",
+      category: "Distribution & Availability" as const,
+      categorySource: "ai" as const,
+      priority: "Medium" as const,
+      prioritySource: "ai" as const,
+      status: "Open" as const,
+      aiSuggestionAvailable: true,
+      messages: [
+        {
+          role: "author" as const,
+          visibility: "public" as const,
+          body: "My readers are messaging that 'Debugging Life' has been out of stock on Flipkart for the last 5 days despite active marketing campaigns. Can we replenish print-on-demand stock immediately?"
+        },
+        {
+          role: "admin" as const,
+          visibility: "internal" as const,
+          body: "In-house POD printer queue had a paper stock replenishment delay. Fresh batch of 150 units dispatched to Flipkart Bhiwandi FC today."
+        }
+      ]
+    },
+    {
+      authorId: "AUTH005",
+      bookId: "BK008",
+      subject: "Final interior typesetting proof approved for launch",
+      description: "I have reviewed the typesetting layout and proofed chapters 1 through 14. Everything looks fantastic. Please proceed with generating the final print-ready PDF and cover spine adjustment.",
+      category: "Book Status & Production Updates" as const,
+      categorySource: "ai" as const,
+      priority: "Medium" as const,
+      prioritySource: "default" as const,
+      status: "Resolved" as const,
+      aiSuggestionAvailable: true,
+      messages: [
+        {
+          role: "author" as const,
+          visibility: "public" as const,
+          body: "I have reviewed the typesetting layout and proofed chapters 1 through 14. Everything looks fantastic. Please proceed with generating the final print-ready PDF and cover spine adjustment."
+        },
+        {
+          role: "admin" as const,
+          visibility: "public" as const,
+          body: "Hello Meera, thank you for the sign-off! Production has locked the interior files and pre-flight checks have passed. You are officially scheduled for release next week!"
+        }
+      ]
+    },
+    {
+      authorId: "AUTH006",
+      bookId: "BK010",
+      subject: "Author copies bulk discount and shipping timeline for book launch event",
+      description: "I am organizing a private book signing event in Chandigarh on the 15th of next month and would like to order 75 author copies of 'Turban Tales'. What is the author pricing tier and estimated transit time?",
+      category: "General Inquiry" as const,
+      categorySource: "ai" as const,
+      priority: "Low" as const,
+      prioritySource: "default" as const,
+      status: "Closed" as const,
+      aiSuggestionAvailable: true,
+      messages: [
+        {
+          role: "author" as const,
+          visibility: "public" as const,
+          body: "I am organizing a private book signing event in Chandigarh on the 15th of next month and would like to order 75 author copies of 'Turban Tales'. What is the author pricing tier and estimated transit time?"
+        },
+        {
+          role: "admin" as const,
+          visibility: "public" as const,
+          body: "Hi Arjun, congratulations on your upcoming launch! Authors receive a 45% discount on MRP for orders exceeding 50 copies. Production and shipping to Chandigarh typically takes 4-6 business days."
+        }
+      ]
+    },
+    {
+      authorId: "AUTH007",
+      bookId: "BK011",
+      subject: "Urgent: TDS Certificate Form 16A request for FY 2024-25 royalty earnings",
+      description: "My chartered accountant requires Form 16A TDS certificates for tax filing for the royalty earnings paid out between April 2024 and March 2025. Please email the signed certificates as soon as possible.",
+      category: "Royalty & Payments" as const,
+      categorySource: "ai" as const,
+      priority: "Critical" as const,
+      prioritySource: "ai" as const,
+      status: "Open" as const,
+      aiSuggestionAvailable: true,
+      messages: [
+        {
+          role: "author" as const,
+          visibility: "public" as const,
+          body: "My chartered accountant requires Form 16A TDS certificates for tax filing for the royalty earnings paid out between April 2024 and March 2025. Please email the signed certificates as soon as possible."
+        }
+      ]
+    }
+  ];
+
+  for (const item of sampleTicketDefinitions) {
+    const authorUser = await User.findOne({ authorId: item.authorId });
+    if (!authorUser) continue;
+
+    let ticket = await Ticket.findOne({ subject: item.subject, authorId: item.authorId });
+    if (!ticket) {
+      ticket = await Ticket.create({
+        authorId: item.authorId,
+        bookId: item.bookId,
+        subject: item.subject,
+        description: item.description,
+        category: item.category,
+        categorySource: item.categorySource,
+        priority: item.priority,
+        prioritySource: item.prioritySource,
+        status: item.status,
+        aiSuggestionAvailable: item.aiSuggestionAvailable
+      });
+
+      // Seed messages
+      for (const msg of item.messages) {
+        const senderId = msg.role === "admin" && adminDoc ? adminDoc._id : authorUser._id;
+        await TicketMessage.create({
+          ticketId: ticket._id,
+          senderId,
+          senderRole: msg.role,
+          body: msg.body,
+          visibility: msg.visibility
+        });
+      }
+
+      // Seed AI classification metadata
+      await AIMeta.create({
+        ticketId: ticket._id,
+        task: "classification",
+        model: "gpt-4o-mini",
+        promptVersion: "v1.2",
+        confidence: 0.95,
+        latencyMs: 380,
+        success: true,
+        failureReason: null
+      });
+
+      ticketCount += 1;
+    }
+  }
+
+  console.info(`Seed complete: ${parsed.authors.length} authors, ${bookCount} books, ${ticketCount} tickets, and 1 admin account.`);
 }
 
 seed()

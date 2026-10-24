@@ -1,6 +1,6 @@
 import React from 'react';
 import type { User } from '../types';
-import { BookOpen, User as UserIcon, LogOut, Sparkles, RefreshCw, Shield, HelpCircle } from 'lucide-react';
+import { BookOpen, LogOut, RefreshCw } from 'lucide-react';
 
 interface NavbarProps {
   user: User | null;
@@ -35,7 +35,6 @@ export const Navbar: React.FC<NavbarProps> = ({
         flexWrap: 'wrap',
         gap: 16
       }}>
-        {/* Brand */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <div style={{
             background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
@@ -78,9 +77,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
 
-        {/* Status & User Actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          {/* Real-time Indicator */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
@@ -103,7 +100,6 @@ export const Navbar: React.FC<NavbarProps> = ({
             </span>
           </div>
 
-          {/* Demo Account Switcher Button */}
           <button
             id="demo-switcher-btn"
             onClick={onOpenDemoSwitcher}
@@ -128,8 +124,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span>Switch Account</span>
           </button>
 
-          {/* User Profile */}
-          {user ? (
+          {user && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <div style={{ textAlign: 'right' }}>
                 <div style={{ fontSize: 13, fontWeight: 600, color: '#ffffff' }}>
@@ -162,7 +157,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span>Logout</span>
               </button>
             </div>
-          ) : null}
+          )}
         </div>
       </div>
     </header>

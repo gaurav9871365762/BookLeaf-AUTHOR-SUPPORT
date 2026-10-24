@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import type { Book, Ticket } from '../types';
 import { api } from '../services/api';
-import { Send, Sparkles, CheckCircle2, AlertCircle, HelpCircle, BookOpen } from 'lucide-react';
+import { Send, Sparkles, CheckCircle2, AlertCircle } from 'lucide-react';
 
 interface AuthorNewTicketProps {
   books: Book[];
@@ -39,7 +39,7 @@ export const AuthorNewTicket: React.FC<AuthorNewTicketProps> = ({
     try {
       setSubmitting(true);
       setError(null);
-      // Notice: authorId is NEVER sent in the request body! The backend extracts it from the logged-in JWT session!
+      // authorId is derived strictly from the authenticated JWT session on the server
       const result = await api.createTicket({
         bookId: selectedBookId ? selectedBookId : null,
         subject: subject.trim(),
@@ -47,8 +47,6 @@ export const AuthorNewTicket: React.FC<AuthorNewTicketProps> = ({
       });
 
       setCreatedResult(result);
-
-      // Auto redirect to ticket detail after brief moment to celebrate AI triage
       setTimeout(() => {
         onTicketCreated(result.ticket);
       }, 1500);
@@ -67,7 +65,6 @@ export const AuthorNewTicket: React.FC<AuthorNewTicketProps> = ({
         padding: '32px',
         boxShadow: 'var(--shadow-md)'
       }}>
-        {/* Header */}
         <div style={{ borderBottom: '1px solid #f1f5f9', paddingBottom: 20, marginBottom: 24 }}>
           <div style={{
             display: 'inline-flex',
@@ -144,7 +141,6 @@ export const AuthorNewTicket: React.FC<AuthorNewTicketProps> = ({
           </div>
         ) : (
           <form onSubmit={handleSubmit}>
-            {/* Book Selector (Book dropdown with General / Account Level option) */}
             <div style={{ marginBottom: 20 }}>
               <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#334155', marginBottom: 6 }}>
                 Related Book (or Account Level)
@@ -179,7 +175,6 @@ export const AuthorNewTicket: React.FC<AuthorNewTicketProps> = ({
               </p>
             </div>
 
-            {/* Subject */}
             <div style={{ marginBottom: 20 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
                 <label style={{ fontSize: 13, fontWeight: 700, color: '#334155' }}>
@@ -208,7 +203,6 @@ export const AuthorNewTicket: React.FC<AuthorNewTicketProps> = ({
               />
             </div>
 
-            {/* Description */}
             <div style={{ marginBottom: 24 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
                 <label style={{ fontSize: 13, fontWeight: 700, color: '#334155' }}>
@@ -247,7 +241,6 @@ export const AuthorNewTicket: React.FC<AuthorNewTicketProps> = ({
               </div>
             </div>
 
-            {/* Action Buttons */}
             <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
               <button
                 type="button"

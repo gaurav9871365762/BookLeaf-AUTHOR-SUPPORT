@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Book } from '../types';
-import { BookOpen, IndianRupee, ShoppingBag, Clock, ExternalLink, AlertTriangle, Layers, Calendar } from 'lucide-react';
+import { BookOpen, IndianRupee, ShoppingBag, Clock, ExternalLink } from 'lucide-react';
 
 interface AuthorBooksProps {
   books: Book[];
@@ -9,7 +9,6 @@ interface AuthorBooksProps {
 }
 
 export const AuthorBooks: React.FC<AuthorBooksProps> = ({ books, loading, onRaiseTicket }) => {
-  // Aggregate author totals
   const totalSold = books.reduce((acc, b) => acc + (b.copiesSold || 0), 0);
   const totalEarned = books.reduce((acc, b) => acc + (b.royaltyEarned || 0), 0);
   const totalPaid = books.reduce((acc, b) => acc + (b.royaltyPaid || 0), 0);
@@ -62,7 +61,6 @@ export const AuthorBooks: React.FC<AuthorBooksProps> = ({ books, loading, onRais
 
   return (
     <div className="animate-fade-in">
-      {/* Royalty Analytics Stat Cards */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
@@ -146,7 +144,6 @@ export const AuthorBooks: React.FC<AuthorBooksProps> = ({ books, loading, onRais
         </div>
       </div>
 
-      {/* Book Cards Grid */}
       <h3 style={{
         fontFamily: 'Outfit, sans-serif',
         fontSize: 18,
@@ -177,7 +174,6 @@ export const AuthorBooks: React.FC<AuthorBooksProps> = ({ books, loading, onRais
               }}
             >
               <div>
-                {/* Header with Title and Status */}
                 <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10, marginBottom: 10 }}>
                   <div>
                     <span style={{
@@ -220,7 +216,6 @@ export const AuthorBooks: React.FC<AuthorBooksProps> = ({ books, loading, onRais
                   Genre: <strong>{renderValueOrDash(book.genre)}</strong>
                 </div>
 
-                {/* Metadata Details (with strict null-safe handling) */}
                 <div style={{
                   background: '#f8fafc',
                   borderRadius: 10,
@@ -274,7 +269,6 @@ export const AuthorBooks: React.FC<AuthorBooksProps> = ({ books, loading, onRais
                   </div>
                 </div>
 
-                {/* Sales & Royalty Box */}
                 <div style={{
                   border: '1px solid #e2e8f0',
                   borderRadius: 10,
@@ -300,7 +294,6 @@ export const AuthorBooks: React.FC<AuthorBooksProps> = ({ books, loading, onRais
                   </div>
                 </div>
 
-                {/* Available On tags */}
                 {book.availableOn && book.availableOn.length > 0 ? (
                   <div style={{ marginBottom: 16 }}>
                     <div style={{ fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', marginBottom: 6 }}>
@@ -329,7 +322,6 @@ export const AuthorBooks: React.FC<AuthorBooksProps> = ({ books, loading, onRais
                 )}
               </div>
 
-              {/* Action Button */}
               <button
                 id={`raise-ticket-btn-${book.bookId}`}
                 onClick={() => onRaiseTicket(book.bookId)}

@@ -27,7 +27,6 @@ export function initSocketServer(httpServer: HttpServer, allowedOrigin: string):
       }
 
       if (!token) {
-        // Allow anonymous connection with limited room access or proceed
         return next();
       }
 
@@ -41,29 +40,20 @@ export function initSocketServer(httpServer: HttpServer, allowedOrigin: string):
   });
 
   io.on("connection", (socket: Socket) => {
-    // Join specific ticket room if requested
     socket.on("join:ticket", (ticketId: string) => {
-      if (ticketId) {
-        socket.join(`ticket:${ticketId}`);
-      }
+      if (ticketId) socket.join(`ticket:${ticketId}`);
     });
 
     socket.on("leave:ticket", (ticketId: string) => {
-      if (ticketId) {
-        socket.leave(`ticket:${ticketId}`);
-      }
+      if (ticketId) socket.leave(`ticket:${ticketId}`);
     });
 
-    // Join admin room if user role is admin
     socket.on("join:admin", () => {
       socket.join("admin-room");
     });
 
-    // Join author room
     socket.on("join:author", (authorId: string) => {
-      if (authorId) {
-        socket.join(`author:${authorId}`);
-      }
+      if (authorId) socket.join(`author:${authorId}`);
     });
   });
 
@@ -89,8 +79,8 @@ export function emitTicketUpdated(ticket: unknown, authorId: string, ticketId: s
 
 export function emitMessageCreated(ticketId: string, authorId: string, message: { visibility: string } & unknown): void {
   if (!io) return;
+  // Security boundary: Internal notes are strictly emitted only to the admin room
   if (message.visibility === "internal") {
-    // INTERNAL NOTES ARE ONLY SENT TO ADMIN ROOM! NEVER TO AUTHOR!
     io.to("admin-room").emit("message:created", message);
   } else {
     io.to("admin-room").emit("message:created", message);
